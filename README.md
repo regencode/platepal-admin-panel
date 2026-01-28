@@ -34,13 +34,13 @@ Password: admin1234
 
 ### Nutrition Goal CRUD
 ![create nutrition goal](./screenshots/create_nutrition_goal.png)
-![update nutrition goal](./screenshots/update_nutrition_goal.png)
+![update nutrition goal](./screenshots/edit_nutrition_goal.png)
 ![delete nutrition goal](./screenshots/delete_nutrition_goal.png)
 
 
 ### Membership CRUD
 ![create membership](./screenshots/create_membership.png)
-![update membership](./screenshots/update_membership.png)
+![update membership](./screenshots/edit_membership.png)
 ![delete membership](./screenshots/delete_membership.png)
 
 
