@@ -2,8 +2,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CreateNutritionGoalDialog } from "./CreateNutritionGoalDialog";
-import { CreateMembershipDialog } from "./CreateMembershipDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Membership } from "../memberships/columns";
+import { CreateNutritionGoalDialog } from "./CreateNutritionGoalDialog";
+import { EditNutritionGoalDialog } from "./EditNutritionGoalDialog";
+import { DeleteNutritionGoalDialog } from "./DeleteNutritionGoalDialog";
+
+import { CreateMembershipDialog } from "./CreateMembershipDialog";
+import { EditMembershipDialog } from "./EditMembershipDialog";
+import { DeleteMembershipDialog } from "./DeleteMembershipDialog";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -22,10 +26,19 @@ export enum Role {
 }
 
 export type NutritionGoal = {
+    id: number
     calories_kcal: number
     carbohydrates_g: number
     fat_g: number
     protein_g: number
+}
+
+export type Membership = {
+    id: number
+    userId: number,
+    tier: string,
+    createdAt: Date,
+    expiresAt: Date,
 }
 
 export type User = {
@@ -67,12 +80,38 @@ const columns: ColumnDef<User>[] = [
         accessorKey: "nutritionGoal",
         header: "nutritionGoal",
         cell: ({ row }) => {
-            const value = row.getValue("nutritionGoal")
-            return value ? "TRUE" : (
+            const value : NutritionGoal | null = row.getValue("nutritionGoal")
+            console.log(value);
+            return value ? (
+                <>
+                    <p> Nutrition goal exists </p>
+                    <div className="flex flex-row">
+                        <EditNutritionGoalDialog 
+                        userId={row.getValue("id")} 
+                        userName={row.getValue("name")} 
+                        id={value.id}
+                        calories={value.calories_kcal}
+                        carbohydrates={value.carbohydrates_g}
+                        fat={value.fat_g}
+                        protein={value.protein_g}
+                        />
+                        <DeleteNutritionGoalDialog 
+                        userId={row.getValue("id")} 
+                        userName={row.getValue("name")} 
+                        id={value.id}
+                        />
+                    </div>
+                </>
+            )
+                : 
+            (
                 <>
                     <p> No nutrition goal</p>
-                    <CreateNutritionGoalDialog />
-                    </>
+                    <CreateNutritionGoalDialog 
+                    userId={row.getValue("id")} 
+                    userName={row.getValue("name")} 
+                    />
+                </>
             );
         },
     },
@@ -80,11 +119,34 @@ const columns: ColumnDef<User>[] = [
         accessorKey: "membership",
         header: "Membership",
         cell: ({ row }) => {
-            const value = row.getValue("membership")
-            return value ? "TRUE" : (
+            const value : Membership = row.getValue("membership")
+            return value ? (
+            <>
+                <p> Membership active </p>
+                <div className="flex flex-row">
+                    <EditMembershipDialog 
+                    userId={row.getValue("id")} 
+                    userName={row.getValue("name")} 
+                    id={value.id}
+                    createdAt={value.createdAt}
+                    expiresAt={value.expiresAt}
+                    />
+                    <DeleteMembershipDialog
+                    userId={row.getValue("id")} 
+                    userName={row.getValue("name")} 
+                    id={value.id}
+                    />
+                </div>
+            </>
+            ) 
+            : 
+            (
             <>
                 <p> No active membership</p>
-                <CreateMembershipDialog />
+                <CreateMembershipDialog 
+                userId={row.getValue("id")} 
+                userName={row.getValue("name")} 
+                />
                 </>
             );
         },

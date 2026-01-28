@@ -3,7 +3,9 @@ import { apiClient } from "./apiClient";
 
 export const UserAPI = {
     getAllUsers: async () => {
-        const res = await apiClient.get("/users");
+        const res = await apiClient.get("/users", {
+            withCredentials: true,
+        });
         return res;
     },
     editUser: async (userId: number, payload: any) => {

@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import { columns } from "./users/columns"
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { loginAsAdmin } from "./actions/auth";
@@ -24,7 +23,7 @@ export default function Home() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<Error | null>(null);
-    const { accessToken, setAccessToken } = useAuth();
+    const { accessToken, setAccessToken, isAuthenticated } = useAuth();
     const router = useRouter();
     
     useEffect(() => {
@@ -45,11 +44,10 @@ export default function Home() {
         // login
         try {
             setError(null);
-            const data = await loginAsAdmin({
+            const { data } = await loginAsAdmin({
                 email, password
             });
             setAccessToken(data.accessToken);
-            sessionStorage.setItem("refreshToken", data.refreshToken);
             router.push("/dashboard");
         }
         catch (e) {

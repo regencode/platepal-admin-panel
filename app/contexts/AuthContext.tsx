@@ -1,53 +1,63 @@
 "use client";
-import { createContext, useState, useContext, useEffect } from "react";
+
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { refresh } from "../actions/auth";
-import { setAccessTokenStorage } from "../actions/apiClient";
 
 interface AuthContextType {
-    accessToken: string | null;
-    setAccessToken: (token: string | null) => void;
+  accessToken: string | null;
+  setAccessToken: (token: string | null) => void;
+  isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({
-    accessToken: null,
-    setAccessToken: () => {},
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [accessToken, _setAccessToken] = useState<string | null>(null);
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-    const setAccessToken = (token: string | null) => {
-        _setAccessToken(token);
-        setAccessTokenStorage(token);
-    }
-    const getAccessToken = async () => {
-        try {
-            // check if refresh token cookie is active
-            const res = await refresh();
-            if(res.status >= 300) {
-                setAccessToken(null);
-                console.log("no refresh cookie");
-                return;
-            }
-            const data = res.data;
-            console.log("refresh cookie found");
-            setAccessToken(data.accessToken);
+  // Restore session ONCE on app load
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const res = await refresh(); // uses refresh cookie
+        if (res.status < 300) {
+          setAccessToken(res.data.accessToken);
+        } else {
+          setAccessToken(null);
         }
-        catch {
-            setAccessToken(null);
-        }
-    }
-    useEffect(() => {
-        getAccessToken();
-    }, [])
+      } catch {
+        setAccessToken(null);
+      } finally {
+        setInitialized(true);
+      }
+    };
 
-    return (
-        <AuthContext.Provider value={{ accessToken, setAccessToken }}>
-            {children}
-        </AuthContext.Provider>
-    )
+    restoreSession();
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        setAccessToken,
+        isAuthenticated: !!accessToken,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
-    return useContext(AuthContext);
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return ctx;
 }

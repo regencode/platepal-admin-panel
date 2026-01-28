@@ -1,5 +1,4 @@
-import { apiClient, deleteRefreshToken } from "./apiClient";
-import { storeRefreshToken, getRefreshToken } from "./apiClient";
+import { apiClient } from "./apiClient";
 
 
 export async function loginAsAdmin(payload: any) {
@@ -8,40 +7,28 @@ export async function loginAsAdmin(payload: any) {
         if(res.status >= 300) {
             throw new Error(res.statusText);
         };
-        storeRefreshToken(res.data.refreshToken);
-        return res.data;
+        return res;
     }
     catch (e) {
         throw e;
     }
 }
 
-export async function logout() {
-    const refreshToken = getRefreshToken();
+export async function logout(refreshToken: string) {
     const res = await apiClient.post("/auth/logout", {}, {
         headers: {
             Authorization: `Bearer ${refreshToken}`
         }
     });
-    deleteRefreshToken();
     return res;
 }
 
 export async function refresh() {
-    try {
-        const refreshToken = getRefreshToken();
-        const res = await apiClient.post("/auth/refresh", {}, { 
-            headers: {
-                Authorization: `Bearer ${refreshToken}`
-            }
-        });
-        if(res.status >= 300) {
-            throw new Error(res.statusText);
-        };
-        storeRefreshToken(res.data.refreshToken);
-        return res.data;
-    }
-    catch (e) {
-        throw e;
-    }
+    const res = await apiClient.post("/auth/refresh", {}, { 
+        withCredentials: true,
+    });
+    if(res.status >= 300) {
+        throw new Error(res.statusText);
+    };
+    return res;
 }

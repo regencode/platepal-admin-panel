@@ -17,28 +17,43 @@ import { useAuth } from "../contexts/AuthContext"
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MealAPI } from "../actions/mealItems";
+import { setInterceptorAccessToken } from "../actions/apiClient";
+import { refresh } from "../actions/auth";
 
-export default function Page() {
-    const { accessToken, setAccessToken } = useAuth();
+export interface ClientViewProps {
+    users: any;
+    mealItems: any;
+}
+
+export default function ClientView(props: ClientViewProps) {
+    const { accessToken, setAccessToken, isAuthenticated } = useAuth();
     const [loading, setLoading] = useState(true);
-    const [users, setUsers] = useState([]);
-    const [mealItems, setMealItems] = useState([]);
-    const [selectedTable, setSelectedTable] = useState<string>("users");
+    const [users, setUsers] = useState(props.users);
+    const [mealItems, setMealItems] = useState(props.mealItems);
     const router = useRouter();
 
 
     const getDataFromAPI = async () => {
+        setLoading(false);
+        let token = accessToken;
+        if(!token) {
+            const res = await refresh();
+            if(res.status >= 300) {
+                console.error(res);
+                return;
+            }
+            const data = res.data;
+            token = data.accessToken;
+            setAccessToken(token);
+        }
+        setInterceptorAccessToken(token);
         let res = await UserAPI.getAllUsers(); 
         setUsers(res.data);
         res = await MealAPI.getAllMealItems();
         console.log(res);
         setMealItems(res.data);
-        setLoading(false);
     }
     useEffect(() => {
-        if(!accessToken) {
-            router.replace("/");
-        }
         getDataFromAPI();
     }, []);
 
@@ -67,7 +82,7 @@ export default function Page() {
             </TabsList>
             <TabsContent value="users" className="w-[90%] mx-auto">
                 <h1>Manage your users...</h1>
-                <UsersDataTable columns={UserColumns} data={users} />
+                <UsersDataTable columns={UserColumns} data={users ?? []} />
             </TabsContent>
             <TabsContent value="mealItems" className="w-[90%] mx-auto">
                 <h1>Manage your users' meal items...</h1>
