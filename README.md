@@ -1,3 +1,49 @@
+# PlatePal admin panel
+
+Deployed with Vercel in [https://platepal-admin-panel.vercel.app](https://platepal-admin-panel.vercel.app)
+
+For testing purpose, the following credentials can be used:
+
+Email: admin@email.com
+
+Password: admin1234
+
+## Features
+- Admin-only Access
+- Manage users
+- Create, Read, Update and Delete every users' nutrition goal
+- Create, Read, Update and Delete every users' membership
+- Table pagination
+- Check revenue based on user membership
+
+
+## KNOWN BUGS
+- On request send, sometimes the page does not update automatically. Users need to manually refresh to update the page for now
+
+## Tech Stack
+- Next.js + TailwindCSS for Frontend
+- shadcn/ui for UI components such as buttons, tables, modals, input fields
+- Axios for API request
+
+
+## Screenshots
+
+### Dashboard
+
+![Dashboard](./screenshots/dashboard.png)
+
+### Nutrition Goal CRUD
+![create nutrition goal](./screenshots/create_nutrition_goal.png)
+![update nutrition goal](./screenshots/update_nutrition_goal.png)
+![delete nutrition goal](./screenshots/delete_nutrition_goal.png)
+
+
+### Membership CRUD
+![create membership](./screenshots/create_membership.png)
+![update membership](./screenshots/update_membership.png)
+![delete membership](./screenshots/delete_membership.png)
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
