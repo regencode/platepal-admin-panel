@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
-import { useContext, useState } from "react";
+import { columns } from "./users/columns"
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { loginAsAdmin } from "./actions/auth";
 import {
@@ -25,6 +26,12 @@ export default function Home() {
     const [error, setError] = useState<Error | null>(null);
     const { accessToken, setAccessToken } = useAuth();
     const router = useRouter();
+    
+    useEffect(() => {
+        if(accessToken) {
+            router.push("/dashboard");
+        }
+    }, [accessToken])
 
     const handleSubmit = async () => {
         if(!email || email.length <= 0) {
@@ -42,7 +49,8 @@ export default function Home() {
                 email, password
             });
             setAccessToken(data.accessToken);
-            router.push("/dashboard")
+            sessionStorage.setItem("refreshToken", data.refreshToken);
+            router.push("/dashboard");
         }
         catch (e) {
             if (e instanceof Error) {

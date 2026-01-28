@@ -1,13 +1,14 @@
-import { apiClient } from "./apiClient";
+import { apiClient, deleteRefreshToken } from "./apiClient";
+import { storeRefreshToken, getRefreshToken } from "./apiClient";
 
 
 export async function loginAsAdmin(payload: any) {
     try {
-        console.log(process.env.NEXT_PUBLIC_API_URL);
         const res = await apiClient.post("/auth/loginAdmin", payload, { withCredentials: true });
         if(res.status >= 300) {
             throw new Error(res.statusText);
         };
+        storeRefreshToken(res.data.refreshToken);
         return res.data;
     }
     catch (e) {
@@ -16,15 +17,31 @@ export async function loginAsAdmin(payload: any) {
 }
 
 export async function logout() {
+    const refreshToken = getRefreshToken();
     const res = await apiClient.post("/auth/logout", {}, {
-        withCredentials: true,
+        headers: {
+            Authorization: `Bearer ${refreshToken}`
+        }
     });
+    deleteRefreshToken();
     return res;
 }
 
 export async function refresh() {
-    const res = await apiClient.post("/auth/refresh", {}, {
-        withCredentials: true,
-    });
-    return res;
+    try {
+        const refreshToken = getRefreshToken();
+        const res = await apiClient.post("/auth/refresh", {}, { 
+            headers: {
+                Authorization: `Bearer ${refreshToken}`
+            }
+        });
+        if(res.status >= 300) {
+            throw new Error(res.statusText);
+        };
+        storeRefreshToken(res.data.refreshToken);
+        return res.data;
+    }
+    catch (e) {
+        throw e;
+    }
 }
