@@ -22,15 +22,11 @@ import { DialogClose } from "@radix-ui/react-dialog"
 import { MembershipAPI } from "../actions/membership"
 import { useRouter } from "next/navigation";
 
-enum MembershipTier {
-    PREMIUM
-}
 
 interface DialogProps {
     userId: number
     userName: string
     id: number
-    tier: MembershipTier
     createdAt: Date
     expiresAt: Date
 }
