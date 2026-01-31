@@ -9,11 +9,15 @@ export const UserAPI = {
         return res;
     },
     editUser: async (userId: number, payload: any) => {
-        const res = await apiClient.patch(`/users/${userId}`, payload);
+        const res = await apiClient.patch(`/users/${userId}`, payload, {
+            withCredentials: true,
+        });
         return res;
     },
     deleteUser: async(userId: number) => {
-        const res = await apiClient.delete(`/users/${userId}`);
+        const res = await apiClient.delete(`/users/${userId}`, {
+            withCredentials: true,
+        });
         return res;
     },
 }

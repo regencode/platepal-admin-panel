@@ -14,11 +14,9 @@ export async function loginAsAdmin(payload: any) {
     }
 }
 
-export async function logout(refreshToken: string) {
+export async function logout() {
     const res = await apiClient.post("/auth/logout", {}, {
-        headers: {
-            Authorization: `Bearer ${refreshToken}`
-        }
+        withCredentials: true
     });
     return res;
 }
@@ -30,5 +28,6 @@ export async function refresh() {
     if(res.status >= 300) {
         throw new Error(res.statusText);
     };
+    console.log("refresh success");
     return res;
 }
